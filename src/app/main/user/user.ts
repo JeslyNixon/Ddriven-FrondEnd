@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data/data';
 import { ToastService } from '../../services/toast/toast';
+import { PermissionService } from '../../services/permission/permission';
 
 
 interface User {
@@ -97,7 +98,8 @@ export class UserComponent implements OnInit {
   }
 
   constructor(private dataService: DataService,
-    private toastService: ToastService) { }
+    private toastService: ToastService,
+    public permissionService: PermissionService) { }
 
   ngOnInit(): void {
     this.loadUsers();

@@ -283,21 +283,11 @@ $border-radius: 12px;
   transition: margin-left $transition-speed ease;
   min-height: 100vh;
   width: 100%;
-  display: flex;
-  flex-direction: column;
 
   // When sidebar is collapsed
   &.sidebar-collapsed {
     margin-left: $sidebar-collapsed-width;
   }
-}
-
-// This wrapper grows to fill all available space,
-// pushing the footer to the very bottom of the viewport
-.page-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
 }
 
 // ============================================

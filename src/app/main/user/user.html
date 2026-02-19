@@ -2,7 +2,7 @@
   <!-- Header -->
   <div class="page-header">
     <h1>User Management</h1>
-    <button class="btn btn-primary" (click)="openCreateUserModal()">
+    <button class="btn btn-primary" *ngIf="permissionService.hasPermission('user.create')" (click)="openCreateUserModal()">
       <span class="icon">+</span> Create User
     </button>
   </div>
@@ -92,13 +92,13 @@
             <td class="hide-mobile">{{ formatDate(user.created_at) }}</td>
             <td>
               <div class="action-buttons">
-                <button class="btn-icon" (click)="openEditUserModal(user)" title="Edit">
+                <button class="btn-icon"  *ngIf="permissionService.hasPermission('user.update')"  (click)="openEditUserModal(user)" title="Edit">
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                     <path d="M13 2l3 3-9 9H4v-3l9-9zM11 4l3 3" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" />
                   </svg>
                 </button>
-                <button class="btn-icon btn-danger" (click)="openDeleteModal(user)" title="Delete">
+                <button class="btn-icon btn-danger"  *ngIf="permissionService.hasPermission('user.delete')"  (click)="openDeleteModal(user)" title="Delete">
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                     <path d="M2 4h14M6 4V2h6v2M7 8v5M11 8v5M3 4l1 11a1 1 0 001 1h8a1 1 0 001-1l1-11"
                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />

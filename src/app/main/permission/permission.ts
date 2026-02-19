@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ToastService } from '../../services/toast/toast';
 import { DataService } from '../../services/data/data';
 import { apiList } from '../../shared/api-List';
-import { PermissionService } from '../../services/permission/permission';
 
 interface Role {
   id: number;
@@ -39,8 +38,7 @@ export class PermissionComponent implements OnInit {
 
   constructor(
     private dataService: DataService,
-    private toastService: ToastService,
-    public permissionService: PermissionService
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {

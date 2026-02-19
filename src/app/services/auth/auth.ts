@@ -22,9 +22,13 @@ export interface User {
   email: string;
   // Add other user fields as needed
 }
-
+export interface Permission {
+  
+  // Add other user fields as needed
+}
 export interface LoginResponse {
   user: User;
+  permissions:Permission;
   token?: string;
 }
 
@@ -90,6 +94,7 @@ export class Auth {
         }
         //Store user data in localStorage
         this.setStoredUser(response.user);
+        this.setStoredPermission(response.permissions);
         this.currentUserSubject.next(response.user);
       }),
       catchError(error => {
@@ -193,8 +198,10 @@ export class Auth {
    * ✅ Store user data in localStorage
    */
   private setStoredUser(user: User): void {
-    console.log(JSON.stringify(user));
     localStorage.setItem('user', JSON.stringify(user));
+  }
+  private setStoredPermission(permission:Permission): void {
+    localStorage.setItem('permission', JSON.stringify(permission));
   }
 
   /**

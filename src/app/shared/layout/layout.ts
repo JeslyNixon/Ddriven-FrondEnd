@@ -5,13 +5,17 @@ import { Auth } from '../../services/auth/auth';
 import { SidebarService } from '../../services/sidebar/sidebar';
 import { FooterComponent } from '../footer/footer';
 import { ToastComponent } from '../toast/toast';
+import { PermissionService } from '../../services/permission/permission';
+
 
 interface MenuItem {
   icon: string;
   label: string;
   route: string;
   badge?: number;
+  permission?: string;  
 }
+
 
 @Component({
   selector: 'app-layout',
@@ -31,18 +35,35 @@ export class LayoutComponent {
     { icon: 'projects', label: 'Projects', route: 'property-list' },
     { icon: 'team', label: 'User', route: 'user' },
     { icon: 'analytics', label: 'Roles', route: 'role' },
-    
-    { icon: 'settings', label: 'Settings', route: 'settings' },
+    { icon: 'settings', label: 'Permission', route: 'permission' },
   ];
 
   constructor(
     private router: Router,
     private authService: Auth,
-    public sidebarService: SidebarService
+    public sidebarService: SidebarService,
+    public permissionService:PermissionService
   ) {}
 
-  ngOnInit(): void {
-    // Fetch company name when component loads
+ 
+ngOnInit(): void {
+  // Load permissions from stored user data
+  const userStr = localStorage.getItem('user');
+  const permission = localStorage.getItem('permission');
+  if (userStr) {
+    const user = JSON.parse(userStr);
+    this.userName.set(user.name ?? 'User');
+    this.userEmail.set(user.email ?? '');
+    
+    if (permission) {
+    const permissions = JSON.parse(permission);
+    const perms: string[] = permissions ?? [];
+    this.permissionService.setPermissions(perms);
+    }
+  }
+
+  this.buildMenu();  // ← build menu AFTER permissions are set
+ 
     this.authService.getCompanySettings().subscribe({
       next: (settings) => {
         this.companyName.set(settings.company_name);
@@ -51,17 +72,21 @@ export class LayoutComponent {
         console.error('Failed to load company settings', error);
       }
     });
+  this.checkScreenSize();
+}
+buildMenu(): void {
+  const allItems: MenuItem[] = [
+    { icon: 'dashboard', label: 'Dashboard',  route: 'dashboard',       permission: 'dashboard.read' },
+    { icon: 'projects',  label: 'Projects',   route: 'property-list',   permission: 'project.read' },
+    { icon: 'team',      label: 'User',        route: 'user',            permission: 'user.read' },
+    { icon: 'analytics', label: 'Roles',       route: 'role',            permission: 'role.read' },
+    { icon: 'settings',  label: 'Permission',  route: 'permission',      permission: 'permission.read' },
+  ];
 
-    const userStr = localStorage.getItem('user');
-    const userNam = userStr ? JSON.parse(userStr).name : 'User';
-    const email = userStr ? JSON.parse(userStr).email : 'email';
-
-    this.userName.set(userNam);
-    this.userEmail.set(email);
-
-    // Auto-collapse on tablet/mobile
-    this.checkScreenSize();
-  }
+  this.menuItems = allItems.filter(item =>
+    !item.permission || this.permissionService.hasPermission(item.permission)
+  );
+}
 
   // Detect screen size and auto-collapse sidebar
   @HostListener('window:resize')

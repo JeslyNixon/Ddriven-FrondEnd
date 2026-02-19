@@ -33,14 +33,14 @@ export const apiList: any ={
         removeUserFromRole:{relativeUrl:'api/roles/remove-User-From-Role'}
 
     },
-    Permission:{
+   Permission:{
         getPermissionsByRole: {relativeUrl: 'api/permissions/get-permissions-by-role'},
         updateRolePermissions: {relativeUrl: 'api/permissions/role-permissions-update'},
         viewRolePermissions: {relativeUrl: 'api/permissions/permissions-view'},
         storePermissions: {relativeUrl: 'api/permissions/permissions-store'},
         getModuleCount : {relativeUrl: 'api/permissions/module-count'},
         getPermissions : {relativeUrl: 'api/permissions/get-permissions'},
-    },    
+    },
 
     Masters:{
         getMasters:{relativeUrl:'api/masters'}

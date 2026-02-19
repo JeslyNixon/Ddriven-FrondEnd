@@ -7,6 +7,7 @@ import { PropertyInspectionFormComponent } from './features/property-inspection-
 import { PropertyListComponent } from './features/property-list/property-list';
 import { UserComponent } from './main/user/user';
 import { RoleComponent } from './main/role/role';
+import { PermissionComponent } from './main/permission/permission';
  
 export const routes: Routes = [
 
@@ -21,6 +22,7 @@ export const routes: Routes = [
       { path: 'property-list', component: PropertyListComponent },
       { path: 'user', component: UserComponent },
       { path: 'role', component: RoleComponent },
+      { path: 'permission', component:PermissionComponent},
     ]
   },
 

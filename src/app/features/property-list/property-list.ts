@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast/toast';
 import { DataService } from '../../services/data/data';
+import { PermissionService } from '../../services/permission/permission';
 
 interface Property {
   id: number;
@@ -85,7 +86,8 @@ export class PropertyListComponent implements OnInit {
   constructor(
     private router: Router,
     private dataService: DataService,
-    private toastService:ToastService
+    private toastService:ToastService,
+    public permissionService:PermissionService
   ) {}
 
   ngOnInit(): void {
