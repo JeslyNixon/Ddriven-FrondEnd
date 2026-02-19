@@ -1,0 +1,18 @@
+<div class="toast" [class.show]="toast.show" [class.toast-success]="toast.type === 'success'"
+  [class.toast-error]="toast.type === 'error'">
+  <div class="toast-icon">
+    <svg *ngIf="toast.type === 'success'" width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5" />
+      <path d="M6 10l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <svg *ngIf="toast.type === 'error'" width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5" />
+      <path d="M7 7l6 6M13 7l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+    <svg *ngIf="toast.type === 'warning'" width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 3L18 17H2L10 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+      <path d="M10 9v4M10 14.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+  </div>
+  <span class="toast-message">{{ toast.message }}</span>
+</div>

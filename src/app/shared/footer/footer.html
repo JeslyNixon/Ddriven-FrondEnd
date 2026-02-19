@@ -1,0 +1,52 @@
+<div class="app-footer" 
+     *ngIf="isVisible$ | async"
+     [class.sidebar-collapsed]="isSidebarCollapsed$ | async">
+  
+  <div class="footer-content">
+    
+    <!-- Left side - Previous button -->
+    <button 
+      *ngIf="(config$ | async)?.showPrevious"
+      class="btn-secondary"
+      [disabled]="(config$ | async)?.disabled"
+      (click)="onPrevious()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      {{ (config$ | async)?.previousLabel || 'Previous' }}
+    </button>
+
+    <div>Copyright © 2020-2021 ShiRah InfoTech Pvt Ltd. All rights reserved.</div>
+
+    <!-- Center - Step indicator (optional) -->
+    <div class="step-info" *ngIf="(config$ | async)?.currentStep && (config$ | async)?.totalSteps">
+      Step {{ (config$ | async)?.currentStep }} of {{ (config$ | async)?.totalSteps }}
+    </div>
+
+    <!-- Right side - Next/Submit button -->
+    <button 
+      *ngIf="(config$ | async)?.showNext"
+      class="btn-primary"
+      [disabled]="(config$ | async)?.disabled"
+      (click)="onNext()">
+      {{ (config$ | async)?.nextLabel || 'Next' }}
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <button 
+      *ngIf="(config$ | async)?.showSubmit"
+      class="btn-submit"
+      [disabled]="(config$ | async)?.disabled"
+      (click)="onSubmit()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      {{ (config$ | async)?.submitLabel || 'Submit' }}
+    </button>
+
+    <div>Version 0.5.64</div>
+
+  </div>
+</div>

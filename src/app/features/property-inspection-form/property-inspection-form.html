@@ -1,0 +1,1045 @@
+<div class="form-container">
+  <!-- Header -->
+  <header class="form-header">
+    <div class="form-title-section">
+      <h1>{{ isEditMode() ? 'Edit' : 'New' }} Vacant Land Inspection</h1>
+      <p>Category: Vacant Land | Step {{ currentStep() }} of {{ totalSteps }}</p>
+    </div>
+  </header>
+
+  <!-- Loading Masters -->
+  @if (isLoadingMasters() || isLoadingProperty()) {
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+      <p>{{ isLoadingProperty() ? 'Loading property data...' : 'Loading form options...' }}</p>
+    </div>
+  }
+
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+    </div>
+    <div class="step-indicators">
+      @for (step of [1,2,3,4,5,6,7]; track step) {
+        <div 
+          class="step-indicator" 
+          [class.active]="currentStep() === step"
+          [class.completed]="currentStep() > step"
+          [class.available]="isStepComplete(step)"
+          (click)="goToStep(step)"
+        >
+          <div class="step-circle">
+            @if (currentStep() > step) {
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            } @else {
+              <span>{{ step }}</span>
+            }
+          </div>
+          <span class="step-label">{{ getStepTitle(step) }}</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Form Content -->
+  <div class="form-content">
+    @if (!isLoadingMasters() && !isLoadingProperty()) {
+      <!-- Step 1: Property Details -->
+      @if (currentStep() === 1) {
+        <div class="form-step">
+          <div class="step-header">
+            <h2>Property Details</h2>
+            <p>Basic information about the property being inspected</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="projectId">Project ID <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="projectId" 
+                [(ngModel)]="propertyDetails().projectId"
+                [class.error]="hasError('projectId')"
+                (input)="clearError('projectId')"
+                placeholder="Enter project ID"
+              />
+               @if (hasError('projectId')) {
+                  <span class="error-message">{{ getError('projectId') }}</span>
+                }
+            </div>
+
+            <div class="form-field">
+              <label for="bank">Bank</label>
+              <input 
+                type="text" 
+                id="bank" 
+                [(ngModel)]="propertyDetails().bank"
+                placeholder="Enter bank name"
+              />
+            </div>
+
+            <div class="form-field full-width">
+              <label for="ownerName">Owner Name <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="ownerName" 
+                [(ngModel)]="propertyDetails().ownerName"
+                [class.error]="hasError('ownerName')"
+                (input)="clearError('ownerName')"
+                placeholder="Enter owner's name"
+              />
+              @if (hasError('ownerName')) {
+    <span class="error-message">{{ getError('ownerName') }}</span>
+  }
+            </div>
+
+            <div class="form-field full-width">
+              <label>Purpose of Inspection <span class="required">*</span></label>
+              <div class="checkbox-group" [class.error]="hasError('purposeOfInspection')">
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    value="Valuation"
+                    [checked]="propertyDetails().purposeOfInspection.includes('Valuation')"
+                    (change)="toggleCheckbox(propertyDetails().purposeOfInspection, 'Valuation')"
+                  />
+                  <span class="checkbox-custom"></span>
+                  Valuation
+                </label>
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    value="Due Diligence"
+                    [checked]="propertyDetails().purposeOfInspection.includes('Due Diligence')"
+                    (change)="toggleCheckbox(propertyDetails().purposeOfInspection, 'Due Diligence')"
+                  />
+                  <span class="checkbox-custom"></span>
+                  Due Diligence
+                </label>
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    value="Feasibility"
+                    [checked]="propertyDetails().purposeOfInspection.includes('Feasibility')"
+                    (change)="toggleCheckbox(propertyDetails().purposeOfInspection, 'Feasibility')"
+                  />
+                  <span class="checkbox-custom"></span>
+                  Feasibility
+                </label>
+              </div>
+              @if (hasError('purposeOfInspection')) {
+    <span class="error-message">{{ getError('purposeOfInspection') }}</span>
+  }
+            </div>
+
+            <div class="form-field full-width">
+              <label for="address">Address as per Site <span class="required">*</span></label>
+              <textarea 
+                id="address" 
+                [(ngModel)]="propertyDetails().address"
+                [class.error]="hasError('address')"
+                (input)="clearError('address')"
+                placeholder="Enter complete address"
+                rows="3"
+              ></textarea>
+              @if (hasError('address')) {
+              <span class="error-message">{{ getError('address') }}</span>
+            }
+            </div>
+
+            <div class="form-field">
+              <label for="personMet">Person Met at Site</label>
+              <input 
+                type="text" 
+                id="personMet" 
+                [(ngModel)]="propertyDetails().personMet"
+                placeholder="Enter name"
+              />
+            </div>
+
+            <div class="form-field">
+            <label for="contactNumber">Contact Number <span class="required">*</span></label>
+            <input 
+              type="tel" 
+              id="contactNumber" 
+              [(ngModel)]="propertyDetails().contactNumber"
+              [class.error]="hasError('contactNumber')"
+              (input)="clearError('contactNumber')"
+              maxlength="10"
+              placeholder="Enter 10-digit mobile number"
+            />
+            @if (hasError('contactNumber')) {
+              <span class="error-message">{{ getError('contactNumber') }}</span>
+            }
+          </div>
+          </div>
+        </div>
+      }
+
+      <!-- Step 2: Location & Access -->
+      @if (currentStep() === 2) {
+        <div class="form-step">
+          <div class="step-header">
+            <h2>Location & Access</h2>
+            <p>Details about property location and accessibility</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field full-width">
+              <label>Access Status <span class="required">*</span></label>
+              <select 
+                class="form-select"
+                [(ngModel)]="locationAccess().accessStatusId"
+                (ngModelChange)="onMasterChange('accessStatus', $event, 'access_status')"
+                [class.error]="hasError('accessStatusId')"
+              >
+                <option [ngValue]="null">Select access status</option>
+                @for (master of getMasterOptions('access_status'); track master.id) {
+                  <option [ngValue]="master.id">{{ master.name }}</option>
+                }
+              </select>
+              @if (hasError('accessStatusId')) {
+    <span class="error-message">{{ getError('accessStatusId') }}</span>
+  }
+            </div>
+
+            @if (locationAccess().accessStatusId === 23) {
+              <div class="form-field full-width">
+                <label for="landlockDistance">Distance to Nearest Motorable Road (Approx)</label>
+                <input 
+                  type="text" 
+                  id="landlockDistance" 
+                  [(ngModel)]="locationAccess().landlockDistance"
+                  placeholder="Enter distance"
+                />
+              </div>
+            }
+
+            <div class="form-field full-width">
+              <label>Number of Access Roads Available <span class="required">*</span></label>
+              <div class="radio-group" [class.error]="hasError('accessRoadsCountId')">
+                @for (master of getMasterOptions('access_roads_count'); track master.id) {
+                  <label class="radio-label">
+                    <input 
+                      type="radio" 
+                      name="numberOfAccessRoads" 
+                      [value]="master.id"
+                      [(ngModel)]="locationAccess().accessRoadsCountId"
+                      (ngModelChange)="onMasterChange('accessRoadsCount', $event, 'access_roads_count')"
+                    />
+                    <span class="radio-custom"></span>
+                    {{ master.name }}
+                  </label>
+                }
+              </div>
+              @if (hasError('accessRoadsCountId')) {
+    <span class="error-message">{{ getError('accessRoadsCountId') }}</span>
+  }
+            </div>
+
+            <!-- Primary Access Road -->
+            <div class="form-section-title full-width">
+              <h3>Primary Access Road</h3>
+            </div>
+
+            <div class="form-field full-width">
+              <label for="primaryRoadName">Name / Description</label>
+              <input 
+                type="text" 
+                id="primaryRoadName" 
+                [(ngModel)]="locationAccess().primaryRoadName"
+                placeholder="Enter road name or description"
+              />
+            </div>
+
+            <div class="form-field">
+              <label>Road Type</label>
+              <select [(ngModel)]="locationAccess().primaryRoadType">
+                <option value="">Select type</option>
+                <option value="CC">CC (Cement Concrete)</option>
+                <option value="BT">BT (Bituminous / Black Top)</option>
+                <option value="Earthen">Earthen</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="primaryRoadWidth">Road Width</label>
+              <input 
+                type="text" 
+                id="primaryRoadWidth" 
+                [(ngModel)]="locationAccess().primaryRoadWidth"
+                placeholder="Enter width (e.g., 20 ft)"
+              />
+            </div>
+
+            <!-- Secondary Access Road -->
+            @if (locationAccess().numberOfAccessRoads === 'Two' || locationAccess().numberOfAccessRoads === 'More than Two') {
+              <div class="form-section-title full-width">
+                <h3>Secondary Access Road</h3>
+              </div>
+
+              <div class="form-field full-width">
+                <label for="secondaryRoadName">Name / Description</label>
+                <input 
+                  type="text" 
+                  id="secondaryRoadName" 
+                  [(ngModel)]="locationAccess().secondaryRoadName"
+                  placeholder="Enter road name or description"
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Road Type</label>
+                <select [(ngModel)]="locationAccess().secondaryRoadType">
+                  <option value="">Select type</option>
+                  <option value="CC">CC (Cement Concrete)</option>
+                  <option value="BT">BT (Bituminous / Black Top)</option>
+                  <option value="Earthen">Earthen</option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="secondaryRoadWidth">Road Width</label>
+                <input 
+                  type="text" 
+                  id="secondaryRoadWidth" 
+                  [(ngModel)]="locationAccess().secondaryRoadWidth"
+                  placeholder="Enter width"
+                />
+              </div>
+            }
+
+            <!-- Tertiary Access Road -->
+            @if (locationAccess().numberOfAccessRoads === 'More than Two') {
+              <div class="form-section-title full-width">
+                <h3>Tertiary Access Road</h3>
+              </div>
+
+              <div class="form-field full-width">
+                <label for="tertiaryRoadName">Name / Description</label>
+                <input 
+                  type="text" 
+                  id="tertiaryRoadName" 
+                  [(ngModel)]="locationAccess().tertiaryRoadName"
+                  placeholder="Enter road name or description"
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Road Type</label>
+                <select [(ngModel)]="locationAccess().tertiaryRoadType">
+                  <option value="">Select type</option>
+                  <option value="CC">CC (Cement Concrete)</option>
+                  <option value="BT">BT (Bituminous / Black Top)</option>
+                  <option value="Earthen">Earthen</option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="tertiaryRoadWidth">Road Width</label>
+                <input 
+                  type="text" 
+                  id="tertiaryRoadWidth" 
+                  [(ngModel)]="locationAccess().tertiaryRoadWidth"
+                  placeholder="Enter width"
+                />
+              </div>
+            }
+
+            <!-- Public Transport -->
+            <div class="form-field full-width">
+              <label>Public Transport</label>
+              <div class="checkbox-group">
+              @for (master of getMasterOptions('public_transport'); track master.id) {
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    [value]="master.id"
+                    [checked]="locationAccess().publicTransport.includes(master.code)"
+                    (change)="toggleCheckbox(locationAccess().publicTransport, master.id)"
+                  />
+                  <span class="checkbox-custom"></span>
+                  {{ master.name }}
+                </label>
+              }
+              </div>
+
+            </div>
+
+            <div class="form-field full-width">
+              <label for="nearestTransportNode">Nearest Public Transport Node</label>
+              <input 
+                type="text" 
+                id="nearestTransportNode" 
+                [(ngModel)]="locationAccess().nearestTransportNode"
+                placeholder="Enter nearest station/stop name"
+              />
+            </div>
+
+            <div class="form-field full-width">
+              <label>Neighbourhood</label>
+              <div class="checkbox-group">
+                @for (master of getMasterOptions('neighbourhood'); track master.id) {
+                  <label class="checkbox-label">
+                    <input 
+                      type="checkbox" 
+                      [value]="master.code"
+                      [checked]="locationAccess().neighbourhood.includes(master.code)"
+                      (change)="toggleCheckbox(locationAccess().neighbourhood, master.code)"
+                    />
+                    <span class="checkbox-custom"></span>
+                    {{ master.name }}
+                  </label>
+                }
+              </div>
+            </div>
+
+            <div class="form-field full-width">
+              <label>Development Status</label>
+              <div class="radio-group">
+                @for (master of getMasterOptions('development_status'); track master.id) {
+                  <label class="radio-label">
+                    <input 
+                      type="radio" 
+                      name="developmentStatus" 
+                      [value]="master.id"
+                      [(ngModel)]="locationAccess().developmentStatusId"
+                      (ngModelChange)="onMasterChange('developmentStatus', $event, 'development_status')"
+                    />
+                    <span class="radio-custom"></span>
+                    {{ master.name }}
+                  </label>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Step 3: Land Particulars -->
+      @if (currentStep() === 3) {
+        <div class="form-step">
+          <div class="step-header">
+            <h2>Land Particulars</h2>
+            <p>Physical characteristics of the land</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field full-width">
+              <label>Shape of Land <span class="required">*</span></label>
+              <select 
+                class="form-select"
+                [(ngModel)]="landParticulars().shapeId"
+                (ngModelChange)="onMasterChange('shape', $event, 'land_shape')"
+                [class.error]="hasError('shapeId')"
+              >
+                <option [ngValue]="null">Select shape</option>
+                @for (master of getMasterOptions('land_shape'); track master.id) {
+                  <option [ngValue]="master.id">{{ master.name }}</option>
+                }
+              </select>
+              @if (hasError('shapeId')) {
+    <span class="error-message">{{ getError('shapeId') }}</span>
+  }
+            </div>
+
+            <div class="form-field full-width">
+              <label>Level vs Road</label>
+              <div class="radio-group" [class.error]="hasError('levelVsRoadId')">
+                @for (master of getMasterOptions('level_vs_road'); track master.id) {
+                  <label class="radio-label">
+                    <input 
+                      type="radio" 
+                      name="levelVsRoad" 
+                      [value]="master.id"
+                      [(ngModel)]="landParticulars().levelVsRoadId"
+                      (ngModelChange)="onMasterChange('levelVsRoad', $event, 'level_vs_road')"
+                    />
+                    <span class="radio-custom"></span>
+                    {{ master.name }}
+                  </label>
+                }
+              </div>
+              @if (hasError('levelVsRoadId')) {
+    <span class="error-message">{{ getError('levelVsRoadId') }}</span>
+  }
+            </div>
+
+            <div class="form-field full-width">
+              <label>Topography <span class="required">*</span></label>
+              <div class="radio-group" [class.error]="hasError('topographyId')">
+                @for (master of getMasterOptions('topography'); track master.id) {
+                  <label class="radio-label">
+                    <input 
+                      type="radio" 
+                      name="topography" 
+                      [value]="master.id"
+                      [(ngModel)]="landParticulars().topographyId"
+                      (ngModelChange)="onMasterChange('topography', $event, 'topography')"
+                    />
+                    <span class="radio-custom"></span>
+                    {{ master.name }}
+                  </label>
+                }
+              </div>
+              @if (hasError('topographyId')) {
+    <span class="error-message">{{ getError('topographyId') }}</span>
+  }
+            </div>
+
+            <div class="form-field full-width">
+              <label>Soil Type</label>
+              <div class="checkbox-group">
+                @for (master of getMasterOptions('soil_type'); track master.id) {
+                  <label class="checkbox-label">
+                    <input 
+                      type="checkbox" 
+                      [value]="master.code"
+                      [checked]="landParticulars().soilType.includes(master.code)"
+                      (change)="toggleCheckbox(landParticulars().soilType, master.code)"
+                    />
+                    <span class="checkbox-custom"></span>
+                    {{ master.name }}
+                  </label>
+                }
+              </div>
+            </div>
+
+            <div class="form-field full-width">
+              <label>Water Stagnation Sign</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input 
+                    type="radio" 
+                    name="waterStagnation" 
+                    value="Yes"
+                    [(ngModel)]="landParticulars().waterStagnation"
+                  />
+                  <span class="radio-custom"></span>
+                  Yes
+                </label>
+                <label class="radio-label">
+                  <input 
+                    type="radio" 
+                    name="waterStagnation" 
+                    value="No"
+                    [(ngModel)]="landParticulars().waterStagnation"
+                  />
+                  <span class="radio-custom"></span>
+                  No
+                </label>
+              </div>
+            </div>
+
+            <div class="form-field full-width">
+              <label for="landRemarks">Remarks</label>
+              <textarea 
+                id="landRemarks" 
+                [(ngModel)]="landParticulars().remarks"
+                placeholder="Additional observations about land particulars"
+                rows="4"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Step 4: Site Boundaries -->
+      @if (currentStep() === 4) {
+        <div class="form-step">
+          <div class="step-header">
+            <h2>Site Boundaries</h2>
+            <p>Information about property boundaries and demarcation</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-section-title full-width">
+              <h3>Abutting Properties/Roads</h3>
+            </div>
+
+            <div class="form-field">
+              <label for="north">North <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="north" 
+                [(ngModel)]="siteBoundaries().north"
+                [class.error]="hasError('north')"
+                (input)="clearError('north')"
+                placeholder="Enter abutting property/road"
+              />
+              @if (hasError('north')) {
+    <span class="error-message">{{ getError('north') }}</span>
+  }
+            </div>
+
+            <div class="form-field">
+              <label for="south">South <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="south" 
+                [(ngModel)]="siteBoundaries().south"
+                [class.error]="hasError('south')"
+                (input)="clearError('south')"
+                placeholder="Enter abutting property/road"
+              />
+              @if (hasError('south')) {
+    <span class="error-message">{{ getError('south') }}</span>
+  }
+            </div>
+
+            <div class="form-field">
+              <label for="east">East <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="east" 
+                [(ngModel)]="siteBoundaries().east"
+                [class.error]="hasError('east')"
+                (input)="clearError('east')"
+                placeholder="Enter abutting property/road"
+              />
+              @if (hasError('east')) {
+                <span class="error-message">{{ getError('east') }}</span>
+              }
+            </div>
+
+            <div class="form-field">
+              <label for="west">West <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="west" 
+                [(ngModel)]="siteBoundaries().west"
+                [class.error]="hasError('west')"
+                (input)="clearError('west')"
+                placeholder="Enter abutting property/road"
+              />
+               @if (hasError('west')) {
+                  <span class="error-message">{{ getError('west') }}</span>
+                }
+            </div>
+
+            <div class="form-field full-width">
+              <label>Boundaries Identified</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input 
+                    type="radio" 
+                    name="boundariesIdentified" 
+                    value="Yes"
+                    [(ngModel)]="siteBoundaries().boundariesIdentified"
+                  />
+                  <span class="radio-custom"></span>
+                  Yes
+                </label>
+                <label class="radio-label">
+                  <input 
+                    type="radio" 
+                    name="boundariesIdentified" 
+                    value="No"
+                    [(ngModel)]="siteBoundaries().boundariesIdentified"
+                  />
+                  <span class="radio-custom"></span>
+                  No
+                </label>
+              </div>
+            </div>
+
+            <div class="form-field full-width">
+              <label>Status of Boundary Demarcation on Site</label>
+              <div class="checkbox-group">
+              @for (master of getMasterOptions('boundary_demarcation'); track master.id) {
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    [value]="master.id"
+                    [checked]="siteBoundaries().boundary_demarcation.includes(master.code)"
+                    (change)="toggleCheckbox(siteBoundaries().boundary_demarcation, master.id)"
+                  />
+                  <span class="checkbox-custom"></span>
+                  {{ master.name }}
+                </label>
+              }
+              </div>
+            </div>
+
+            <div class="form-field full-width">
+              <label for="boundaryDetails">Boundary Details/Remarks</label>
+              <textarea 
+                id="boundaryDetails" 
+                [(ngModel)]="siteBoundaries().boundaryDetails"
+                placeholder="Additional details about boundaries"
+                rows="4"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Step 5: Other Observations -->
+      @if (currentStep() === 5) {
+        <div class="form-step">
+          <div class="step-header">
+            <h2>Other Site Observations</h2>
+            <p>Additional features and restrictions at the site</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field full-width">
+              <label>Road Widening Signs</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input 
+                    type="radio" 
+                    name="roadWideninsSigns" 
+                    value="Yes"
+                    [(ngModel)]="otherObservations().roadWideninsSigns"
+                  />
+                  <span class="radio-custom"></span>
+                  Yes
+                </label>
+                <label class="radio-label">
+                  <input 
+                    type="radio" 
+                    name="roadWideninsSigns" 
+                    value="No"
+                    [(ngModel)]="otherObservations().roadWideninsSigns"
+                  />
+                  <span class="radio-custom"></span>
+                  No
+                </label>
+              </div>
+            </div>
+
+            <div class="form-field full-width">
+              <label>High Tension Lines</label>
+              <div class="radio-group">
+                @for (master of getMasterOptions('high_tension_lines'); track master.id) {
+                  <label class="radio-label">
+                    <input 
+                      type="radio" 
+                      name="highTensionLines" 
+                      [value]="master.id"
+                      [(ngModel)]="otherObservations().highTensionLinesId"
+                      (ngModelChange)="onMasterChange('highTensionLines', $event, 'high_tension_lines')"
+                    />
+                    <span class="radio-custom"></span>
+                    {{ master.name }}
+                  </label>
+                }
+              </div>
+            </div>
+
+            <div class="form-field full-width">
+              <label>Canal / Drain</label>
+              <div class="radio-group">
+                @for (master of getMasterOptions('canal_drain'); track master.id) {
+                  <label class="radio-label">
+                    <input 
+                      type="radio" 
+                      name="canalDrain" 
+                      [value]="master.id"
+                      [(ngModel)]="otherObservations().canalDrainId"
+                      (ngModelChange)="onMasterChange('canalDrain', $event, 'canal_drain')"
+                    />
+                    <span class="radio-custom"></span>
+                    {{ master.name }}
+                  </label>
+                }
+              </div>
+            </div>
+
+            <div class="form-field full-width">
+              <label>Water Body Nearby</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input 
+                    type="radio" 
+                    name="waterBodyNearby" 
+                    value="Yes"
+                    [(ngModel)]="otherObservations().waterBodyNearby"
+                  />
+                  <span class="radio-custom"></span>
+                  Yes
+                </label>
+                <label class="radio-label">
+                  <input 
+                    type="radio" 
+                    name="waterBodyNearby" 
+                    value="No"
+                    [(ngModel)]="otherObservations().waterBodyNearby"
+                  />
+                  <span class="radio-custom"></span>
+                  No
+                </label>
+              </div>
+            </div>
+
+            <div class="form-field full-width">
+              <label for="otherRestrictions">Any Other Restrictions</label>
+              <textarea 
+                id="otherRestrictions" 
+                [(ngModel)]="otherObservations().otherRestrictions"
+                placeholder="Describe any other restrictions or observations"
+                rows="4"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Step 6: Photo Upload -->
+      @if (currentStep() === 6) {
+        <div class="form-step">
+          <div class="step-header">
+            <h2>Photo Upload</h2>
+            <p>Upload minimum 5 photos of the property (Required: Approach road, frontage, inside site, all boundaries)</p>
+          </div>
+
+          <div class="photo-upload-section">
+            <div class="upload-area">
+              <input 
+                type="file" 
+                id="photoUpload" 
+                accept="image/*" 
+                multiple 
+                (change)="onFileSelect($event)"
+                hidden
+              />
+              <label for="photoUpload" class="upload-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <h3>Click to upload photos</h3>
+                <p>or drag and drop</p>
+                <span class="file-info">PNG, JPG up to 10MB each</span>
+              </label>
+            </div>
+
+            @if (uploadedPhotos().length > 0) {
+              <div class="photo-grid">
+                @for (photo of uploadedPhotos(); track $index) {
+                  <div class="photo-item">
+                    <img [src]="'data:image/*;base64,' + photo" alt="Property photo" />
+                    <button class="remove-photo" (click)="removePhoto($index)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
+                    <div class="photo-name">{{ photo.name }}</div>
+                  </div>
+                }
+              </div>
+            }
+
+            <div class="photo-checklist">
+              <h3>Photo Checklist</h3>
+              <div class="checklist-items">
+                <div class="checklist-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span>Approach Road & Abutting Road</span>
+                </div>
+                <div class="checklist-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span>Site Frontage</span>
+                </div>
+                <div class="checklist-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span>Inside Site (minimum 5 photos)</span>
+                </div>
+                <div class="checklist-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span>All Boundaries</span>
+                </div>
+                <div class="checklist-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span>Selfie with Person Met (Site in Background)</span>
+                </div>
+                <div class="checklist-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span>Other Features (HT Line, Encroachment, Water Body, Drain, etc.)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Step 7: Summary & Submit -->
+      @if (currentStep() === 7) {
+        <div class="form-step">
+          <div class="step-header">
+            <h2>Summary & Submit</h2>
+            <p>Review your inspection and provide final summary</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field full-width">
+              <label for="keyPositives">Key Positives</label>
+              <textarea 
+                id="keyPositives" 
+                [(ngModel)]="summary().keyPositives"
+                placeholder="List the positive aspects of the property"
+                rows="4"
+              ></textarea>
+            </div>
+
+            <div class="form-field full-width">
+              <label for="keyNegatives">Key Negatives</label>
+              <textarea 
+                id="keyNegatives" 
+                [(ngModel)]="summary().keyNegatives"
+                placeholder="List the negative aspects of the property"
+                rows="4"
+              ></textarea>
+            </div>
+
+            <div class="form-field full-width">
+              <label for="redFlags">Red Flags</label>
+              <textarea 
+                id="redFlags" 
+                [(ngModel)]="summary().redFlags"
+                placeholder="List any critical issues or red flags"
+                rows="4"
+              ></textarea>
+            </div>
+
+            <!-- <div class="inspector-declaration full-width">
+              <h3>Inspector Declaration</h3>
+              <p>I hereby declare that the information provided above is accurate to the best of my knowledge and based on my physical inspection of the property.</p>
+              
+              <div class="form-field">
+                <label for="inspectorName">Inspector Name</label>
+                <input 
+                  type="text" 
+                  id="inspectorName" 
+                  placeholder="Enter your full name"
+                />
+              </div>
+
+              <div class="signature-area">
+                <label>Inspector Signature</label>
+                <div class="signature-box">
+                  <p>Digital signature will be captured upon submission</p>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label>Date</label>
+                <input 
+                  type="date" 
+                  [value]="currentDate"
+                  readonly
+                />
+              </div>
+            </div> -->
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Form Navigation -->
+  <div class="form-navigation">
+    <button 
+      class="btn btn-secondary" 
+      (click)="previousStep()" 
+      [disabled]="currentStep() === 1"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+      </svg>
+      Previous
+    </button>
+
+    <div class="step-counter">
+      Step {{ currentStep() }} of {{ totalSteps }}
+    </div>
+
+    @if (currentStep() < totalSteps) {
+      <div style="display: flex; gap: 1rem;">
+      <button class="btn btn-primary draft" (click)="submitForm(true)"
+          [disabled]="isSubmitting() || submitSuccess()">
+        Save As Draft
+      </button>
+      <button class="btn btn-primary" (click)="nextStep()">
+        Next
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+      </div>
+    } @else {
+      <div class="form-actions">
+        <!-- Error Alert -->
+        @if (submitError()) {
+          
+          <div class="alert alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span>{{ submitError() }}</span>
+          </div>
+        }
+
+        <!-- Success Alert -->
+        @if (submitSuccess()) {
+          <div class="alert alert-success">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Inspection saved successfully!</span>
+          </div>
+        }
+        <div style="display: flex; gap: 1rem;">
+        <!-- Draft Button -->
+        <button class="btn btn-primary draft" (click)="submitForm(true)"
+          [disabled]="isSubmitting() || submitSuccess()">
+            Save As Draft
+          </button>
+        <!-- Submit Button -->
+        <button 
+          class="btn btn-success" 
+          (click)="submitForm(false)"
+          [disabled]="isSubmitting() || submitSuccess()"
+        >
+          @if (isSubmitting()) {
+            <span class="spinner"></span>
+            <span>Saving...</span>
+          } @else if (submitSuccess()) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Saved Successfully!</span>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Submit</span>
+          }
+        </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

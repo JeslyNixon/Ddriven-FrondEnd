@@ -1,0 +1,70 @@
+<div class="permission-container">
+
+  <!-- Header -->
+  <div class="header-bar">
+    <div class="left-area">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 1v6m0 6v6M6 12H1m6 0h6m6 0h5"/>
+      </svg>
+      <span>Role Permissions settings</span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading permissions...</p>
+  </div>
+
+  <!-- Permission Table -->
+  <div *ngIf="!isLoading" class="panel-box">
+    <table class="permission-table">
+      
+      <thead>
+        <tr>
+          <th class="permission-col"></th>
+          <th *ngFor="let role of roles" class="role-col">
+            <div class="rotate-text">{{ role.display_name || role.name }}</div>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <ng-container *ngFor="let group of permissionGroups">
+
+          <!-- Group Header -->
+          <tr class="group-row">
+            <td [attr.colspan]="roles.length + 1">
+              {{ group.group }}
+            </td>
+          </tr>
+
+          <!-- Permission Rows -->
+          <tr *ngFor="let perm of group.permissions">
+            <td>{{ perm.label }}</td>
+
+            <td *ngFor="let role of roles" class="text-center">
+              <span 
+                class="yes" 
+                *ngIf="permissions[role.id]?.[perm.key]"
+                (click)="togglePermission(role, perm.key)">
+                ✓
+              </span>
+
+              <span 
+                class="no" 
+                *ngIf="!permissions[role.id]?.[perm.key]"
+                (click)="togglePermission(role, perm.key)">
+                ✗
+              </span>
+            </td>
+          </tr>
+
+        </ng-container>
+      </tbody>
+
+    </table>
+  </div>
+
+</div>
